@@ -37,14 +37,23 @@ BIC, and assigns each observation to a phase.
 }
 \examples{
 \donttest{
+# data upload
 if(!require(readr)) install.packages("readr")
 library (readr)
-
 df= read.csv (paste0("https://raw.githubusercontent.com/agronomy4future/",
     "raw_data_practice/refs/heads/main/Practice_Segmented_Regression.csv"))
-
 Mean= aggregate (yield ~ year, data= df, FUN= mean)
 names(Mean)[2]= "yield_Mean"
+
+# import library
+if(!require(remotes)) install.packages("remotes")
+if (!requireNamespace("segreg", quietly = TRUE)) {
+ remotes::install_github("agronomy4future/segreg", force= TRUE)
+}
+library(remotes)
+library(segreg)
+
+# run the model
 model= segreg (yield_Mean ~ year, data= Mean)
 print (model) # Selected breakpoints, model comparison table, and slope by phase
 summary (model) # Full model output with breakpoint CIs and slope CIs
@@ -53,6 +62,7 @@ seg_phase (model) # Original data with an added phase column
 if(!require(ggplot2)) install.packages("ggplot2")
 library(ggplot2)
 
+# ggplot
 ggplot(data= seg_phase(model), aes (x= year, y= yield_Mean)) +
   geom_bar(aes(fill=phase), stat="identity", position="dodge", width=0.9) +
   segreg_line(model, linetype= "dashed", linewidth= 1) +
