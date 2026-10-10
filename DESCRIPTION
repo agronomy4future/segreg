@@ -1,0 +1,24 @@
+Package: segreg
+Title: Segmented Regression with Automatic Breakpoint Selection
+Version: 0.0.0.9000
+Authors@R: 
+    person("JK", "Kim", , "kimjk@agronomy4future.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-9913-8768"))
+Description: Fits segmented (piecewise linear) regression models with zero
+    to a user-specified maximum number of breakpoints using the 'segmented'
+    package, and selects the number of breakpoints by AIC or BIC. Each
+    observation is assigned to a phase defined by the estimated breakpoints,
+    and slopes are reported for each phase. Layers for 'ggplot2' are provided
+    to add the fitted segmented line and vertical lines at breakpoints or
+    phase boundaries to existing plots.
+License: MIT + file LICENSE
+Depends: 
+    R (>= 3.6)
+Imports: 
+    ggplot2,
+    segmented,
+    stats,
+    utils
+Encoding: UTF-8
+Roxygen: list(markdown= TRUE)
+RoxygenNote: 8.0.0
