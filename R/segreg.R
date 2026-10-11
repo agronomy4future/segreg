@@ -6,7 +6,9 @@
 #' @param formula A formula of the form `y ~ x` (one continuous predictor).
 #' @param data A data.frame.
 #' @param k_max Maximum number of breakpoints to test. The linear model
-#'   (0 breakpoints) is always included in the comparison.
+#'   (0 breakpoints) is always included in the comparison. If the selected
+#'   number of breakpoints equals `k_max`, a warning is issued because more
+#'   breakpoints may exist; increase `k_max` in that case.
 #' @param criterion Model selection criterion: "AIC" or "BIC".
 #' @param n_grid Number of grid points used to draw the fitted line.
 #' @param ... Additional arguments passed to `segmented::segmented()`
@@ -91,6 +93,13 @@ segreg = function(formula, data, k_max = 3, criterion = c("AIC", "BIC"),
   best = fits[[as.character(best_k)]]
   bp = if (best_k > 0) sort(unname(best$psi[, "Est."])) else numeric(0)
 
+  # Warn when the selection hits the upper limit: more breakpoints may exist
+  at_kmax = k_max > 0 && best_k == k_max
+  if (at_kmax)
+    warning(sprintf(paste0("The selected number of breakpoints equals k_max (%d). ",
+                           "More breakpoints may exist; consider increasing k_max ",
+                           "(e.g., k_max = %d)."), k_max, k_max + 2), call. = FALSE)
+
   data$phase = cut(data[[xname]], breaks = c(-Inf, bp, Inf),
                    labels = paste0("P", seq_len(length(bp) + 1)))
 
@@ -110,7 +119,7 @@ segreg = function(formula, data, k_max = 3, criterion = c("AIC", "BIC"),
 
   structure(list(model = best, models = fits, best_k = best_k,
                  criterion = criterion, ic_table = ic_table,
-                 breakpoints = bp, data = data, line = line,
+                 breakpoints = bp, at_kmax = at_kmax, data = data, line = line,
                  xname = xname, yname = yname, call = match.call()),
             class = "segreg")
 }
@@ -131,6 +140,9 @@ print.segreg = function(x, ...) {
   print(tab, row.names = FALSE, right = TRUE)
 
   cat("\nBreakpoints:", if (length(bp)) paste(fmt(bp), collapse = ", ") else "none", "\n")
+  if (isTRUE(x$at_kmax))
+    cat("Note: the selected k equals k_max (", x$best_k,
+        "); more breakpoints may exist. Try a larger k_max.\n", sep = "")
 
   # Slope by phase
   xr = range(x$data[[x$xname]])

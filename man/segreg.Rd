@@ -19,7 +19,9 @@ segreg(
 \item{data}{A data.frame.}
 
 \item{k_max}{Maximum number of breakpoints to test. The linear model
-(0 breakpoints) is always included in the comparison.}
+(0 breakpoints) is always included in the comparison. If the selected
+number of breakpoints equals \code{k_max}, a warning is issued because more
+breakpoints may exist; increase \code{k_max} in that case.}
 
 \item{criterion}{Model selection criterion: "AIC" or "BIC".}
 
